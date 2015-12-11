@@ -18,7 +18,7 @@ func Test_CreateTodoItemAPI_FailureMissingParameter(t *testing.T) {
 	// Test the HTTP API
 	req, _ := http.NewRequest(
 		"POST",
-		"/todo",
+		"/todo/new",
 		nil,
 	)
 
@@ -44,7 +44,7 @@ func Test_CreateTodoItemAPI_Success(t *testing.T) {
 	// Test the HTTP API
 	req, _ := http.NewRequest(
 		"POST",
-		"/todo?text=Get%20produce%20from%20the%20grocery%20store",
+		"/todo/new?text=Get%20produce%20from%20the%20grocery%20store",
 		nil,
 	)
 
@@ -70,7 +70,7 @@ func Test_CreateTodoItemAPI_FailureSQL(t *testing.T) {
 	// Test the HTTP API
 	req, _ := http.NewRequest(
 		"POST",
-		"/todo?text=Get%20produce%20from%20the%20grocery%20store",
+		"/todo/new?text=Get%20produce%20from%20the%20grocery%20store",
 		nil,
 	)
 

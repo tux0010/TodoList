@@ -34,7 +34,7 @@ func main() {
 	// Register handlers
 	r := mux.NewRouter()
 	r.HandleFunc("/todo", todolist.GetAllToDoItemsAPI).Methods("GET")
-	r.HandleFunc("/todo", todolist.CreateTodoItemAPI).Methods("POST")
+	r.HandleFunc("/todo/new", todolist.CreateTodoItemAPI).Methods("POST")
 	r.HandleFunc("/todo/{id}", todolist.DeleteToDoItemAPI).Methods("DELETE")
 
 	n := negroni.New()

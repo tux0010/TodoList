@@ -5,64 +5,53 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
 	"time"
 
-	"github.com/satori/go.uuid"
 	"github.com/tux0010/Todo/database"
 )
 
 type ToDoItem struct {
-	UUID      string    `json:"uuid"`
-	Created   time.Time `json:"created"`
-	Completed bool      `json:"completed"`
-	Text      string    `json:"text"`
+	Id      int       `json:"id"`
+	Created time.Time `json:"created"`
+	Text    string    `json:"text"`
 }
 
 var DB database.DatabaseDriver
-var TableName = os.Getenv("TODO_TABLE_NAME")
+var TableName string
+
+func init() {
+	TableName = os.Getenv("TODO_TABLE_NAME")
+}
 
 func NewToDoItem(text string) *ToDoItem {
 	item := &ToDoItem{
-		UUID:      uuid.NewV4().String(),
-		Created:   time.Now(),
-		Completed: false,
-		Text:      text,
+		Created: time.Now(),
+		Text:    text,
 	}
 
 	return item
 }
 
 func getAllToDoItemsQuery(tableName string) string {
-	query := fmt.Sprintf("SELECT * FROM %s;", tableName)
+	query := fmt.Sprintf("SELECT * FROM %s", tableName)
 
 	return query
 }
 
-func getCreateToDoItemQuery(tableName string, item *ToDoItem) string {
+func getCreateToDoItemQuery(tableName string) string {
 	query := fmt.Sprintf(
-		"INSERT INTO %s (uuid, created, completed, text) VALUES (",
+		"INSERT INTO %s (created, text) VALUES (?,?)",
 		tableName,
 	)
-
-	query += fmt.Sprintf(
-		"'%s', '%d', '%s', '%s'",
-		item.UUID,
-		item.Created.Unix(),
-		strconv.FormatBool(item.Completed),
-		item.Text,
-	)
-
-	query += ");"
 
 	return query
 }
 
-func getDeleteToDoItemQuery(tableName string, uuid string) string {
+func getDeleteToDoItemQuery(tableName string, id string) string {
 	query := fmt.Sprintf(
-		"DELETE FROM %s WHERE uuid ='%s';",
+		"DELETE FROM %s WHERE id ='%s'",
 		tableName,
-		uuid,
+		id,
 	)
 
 	return query
@@ -73,7 +62,7 @@ func getToDoItemsFromDBRows(rows *sql.Rows) []ToDoItem {
 
 	for rows.Next() {
 		item := ToDoItem{}
-		rows.Scan(&item.UUID, &item.Created, &item.Completed, &item.Text)
+		rows.Scan(&item.Id, &item.Created, &item.Text)
 
 		toDoItemRows = append(toDoItemRows, item)
 	}
@@ -86,7 +75,7 @@ func getToDoItemsFromDBRows(rows *sql.Rows) []ToDoItem {
 func GetAllToDoItems() ([]ToDoItem, error) {
 	query := getAllToDoItemsQuery(TableName)
 
-	rows, err := DB.ExceuteQueryWithResponse(query)
+	rows, err := DB.ExecuteQueryWithResponse(query)
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -101,15 +90,15 @@ func GetAllToDoItems() ([]ToDoItem, error) {
 // in the database
 func CreateToDoItem(text string) error {
 	item := NewToDoItem(text)
-	query := getCreateToDoItemQuery(TableName, item)
+	query := getCreateToDoItemQuery(TableName)
 
-	return DB.ExecuteQuery(query)
+	return DB.ExecuteQuery(query, item.Created, item.Text)
 }
 
 // DeleteToDoItem will delete a To-Do item from the database
 // given it's UUID
-func DeleteToDoItem(uuid string) error {
-	query := getDeleteToDoItemQuery(TableName, uuid)
+func DeleteToDoItem(id string) error {
+	query := getDeleteToDoItemQuery(TableName, id)
 
 	return DB.ExecuteQuery(query)
 }

@@ -21,6 +21,8 @@ func CreateTodoItemAPI(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error creating TODO item", http.StatusInternalServerError)
 		return
 	}
+
+	w.WriteHeader(http.StatusCreated)
 }
 
 func GetAllToDoItemsAPI(w http.ResponseWriter, r *http.Request) {
@@ -59,4 +61,6 @@ func DeleteToDoItemAPI(w http.ResponseWriter, r *http.Request) {
 
 		http.Error(w, "Unable to delete TODO item", http.StatusInternalServerError)
 	}
+
+	w.WriteHeader(http.StatusNoContent)
 }

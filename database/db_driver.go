@@ -21,12 +21,20 @@ func NewDatabase(conn *sql.DB) *Database {
 // ExecuteQuery will run a Database query and return an error if it fails
 func (d *Database) ExecuteQuery(query string, values ...interface{}) error {
 	res, err := d.db.Exec(query, values...)
-	rowsAffected, _ := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
 	if rowsAffected == 0 {
 		return errors.New("No rows were affected")
 	}
 
-	return err
+	return nil
 }
 
 // ExecuteQueryWithResponse will run a Database query and return the resultant rows

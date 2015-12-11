@@ -29,6 +29,7 @@ func main() {
 	}
 
 	todolist.DB = database.NewDatabase(conn)
+	defer conn.Close()
 
 	// Register handlers
 	r := mux.NewRouter()

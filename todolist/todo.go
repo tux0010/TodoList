@@ -23,6 +23,7 @@ func init() {
 	TableName = os.Getenv("TODO_TABLE_NAME")
 }
 
+// NewToDoItem returns a pointer to a new ToDoItem object
 func NewToDoItem(text string) *ToDoItem {
 	item := &ToDoItem{
 		Created: time.Now(),
@@ -96,7 +97,7 @@ func CreateToDoItem(text string) error {
 }
 
 // DeleteToDoItem will delete a To-Do item from the database
-// given it's UUID
+// given it's ID
 func DeleteToDoItem(id string) error {
 	query := getDeleteToDoItemQuery(TableName, id)
 

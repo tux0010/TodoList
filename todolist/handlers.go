@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/gorilla/mux"
 )
@@ -48,6 +49,14 @@ func DeleteToDoItemAPI(w http.ResponseWriter, r *http.Request) {
 	err := DeleteToDoItem(id)
 	if err != nil {
 		log.Println(err.Error())
+
+		// TODO: there are better ways to do this (e.g. define enums but for now, taking
+		// a shortcut)
+		if strings.Contains(err.Error(), "No rows were affected") {
+			http.Error(w, "Unable to find item to delete", http.StatusNotFound)
+			return
+		}
+
 		http.Error(w, "Unable to delete TODO item", http.StatusInternalServerError)
 	}
 }
